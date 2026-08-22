@@ -5,43 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title></title>
   <style>
-    :root { --black:#050505; --green:#84a98c; }
+    :root { --black:#050505; }
     * { box-sizing:border-box; }
-    html,body { width:100%; height:100%; margin:0; overflow:hidden; background:var(--black); }
-    body { min-height:100svh; }
-    .landing { position:relative; width:100%; height:100svh; overflow:hidden; background:radial-gradient(circle at 50% 45%,rgba(132,169,140,.08),transparent 34%),var(--black); }
+    html,body { margin:0; width:100%; min-height:100%; background:var(--black); overflow-x:hidden; }
+    body { color:transparent; }
+    .scroll-stage { position:relative; height:400vh; background:radial-gradient(circle at 50% 42%,rgba(132,169,140,.08),transparent 34%),var(--black); }
+    .landing { position:sticky; top:0; width:100%; height:100svh; overflow:hidden; background:radial-gradient(circle at 50% 45%,rgba(132,169,140,.08),transparent 34%),var(--black); }
     .landing::before { content:''; position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.08; background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.24) 4px); mix-blend-mode:screen; }
     .landing::after { content:''; position:absolute; inset:0; z-index:2; pointer-events:none; background:radial-gradient(ellipse at center,transparent 42%,rgba(0,0,0,.5) 100%); }
     canvas { position:absolute; inset:0; z-index:0; display:block; width:100%; height:100%; }
-    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none !important; transition:none !important; } }
+    @media (prefers-reduced-motion:reduce) { .scroll-stage { height:100svh; } }
   </style>
 </head>
 <body>
-  <main class="landing" aria-label="">
-    <canvas id="landing-canvas" aria-label=""></canvas>
+  <main class="scroll-stage">
+    <section class="landing" aria-label="">
+      <canvas id="landing-canvas" aria-label=""></canvas>
+    </section>
   </main>
   <script>
+    const total=168;
     const canvas=document.getElementById('landing-canvas');
-    const ctx=canvas.getContext('2d');
-    const image=new Image();
-    image.decoding='async';
-    image.src='/sequence/ezgif-frame-001.jpg';
-    function draw(){
-      if(!image.naturalWidth)return;
-      const ratio=Math.min(innerWidth/image.naturalWidth,innerHeight/image.naturalHeight);
-      const width=image.naturalWidth*ratio;
-      const height=image.naturalHeight*ratio;
+    const ctx=canvas.getContext('2d',{alpha:false});
+    const images=[];
+    let loaded=0;
+    let frame=0;
+    let raf=0;
+    let ready=false;
+    function resize(){
       const dpr=Math.min(devicePixelRatio||1,2);
       canvas.width=innerWidth*dpr;
       canvas.height=innerHeight*dpr;
       canvas.style.width=innerWidth+'px';
       canvas.style.height=innerHeight+'px';
+      draw(frame);
+    }
+    function draw(index){
+      const image=images[index];
+      if(!image||!image.naturalWidth)return;
+      const fit=Math.min(innerWidth/image.naturalWidth,innerHeight/image.naturalHeight);
+      const width=image.naturalWidth*fit;
+      const height=image.naturalHeight*fit;
+      const dpr=Math.min(devicePixelRatio||1,2);
       ctx.setTransform(dpr,0,0,dpr,0,0);
-      ctx.clearRect(0,0,innerWidth,innerHeight);
+      ctx.fillStyle='#050505';
+      ctx.fillRect(0,0,innerWidth,innerHeight);
       ctx.drawImage(image,(innerWidth-width)/2,(innerHeight-height)/2,width,height);
     }
-    image.onload=draw;
-    addEventListener('resize',draw,{passive:true});
+    function update(){
+      const stage=document.querySelector('.scroll-stage');
+      const progress=Math.max(0,Math.min(1,scrollY/(stage.offsetHeight-innerHeight)));
+      const next=Math.round(progress*(total-1));
+      if(next!==frame){ frame=next; draw(frame); }
+    }
+    for(let i=1;i<=total;i++){
+      const image=new Image();
+      image.decoding='async';
+      image.src='/sequence/ezgif-frame-'+String(i).padStart(3,'0')+'.jpg';
+      image.onload=()=>{ loaded++; if(loaded===total){ ready=true; draw(0); } };
+      images.push(image);
+    }
+    addEventListener('resize',resize,{passive:true});
+    addEventListener('scroll',()=>{ if(!ready)return; cancelAnimationFrame(raf); raf=requestAnimationFrame(update); },{passive:true});
+    resize();
   </script>
 </body>
 </html>
