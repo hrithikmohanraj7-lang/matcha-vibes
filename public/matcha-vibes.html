@@ -198,6 +198,28 @@
         cupBody.position.y = -0.4;
         cupBody.rotation.x = Math.PI;
         cupGroup.add(cupBody);
+        // Attempt to replace the procedural cup with a lightweight GLTF model for higher fidelity.
+        (async function loadCupModel(){
+          try {
+            const { GLTFLoader } = await import('https://unpkg.com/three@0.185.1/examples/jsm/loaders/GLTFLoader.js');
+            const gltfLoader = new GLTFLoader();
+            const modelUrl = 'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/WaterBottle/glTF-Binary/WaterBottle.glb';
+            gltfLoader.load(modelUrl, (gltf) => {
+              try {
+                // remove the procedural meshes
+                while (cupGroup.children.length) cupGroup.remove(cupGroup.children[0]);
+                const model = gltf.scene || gltf.scenes[0];
+                model.traverse(node => { if (node.isMesh) { node.castShadow = true; node.receiveShadow = true; } });
+                model.scale.set(2.4, 2.4, 2.4);
+                model.position.y = -0.6;
+                cupGroup.add(model);
+              } catch (inner) { console.warn('apply gltf failed', inner); }
+            }, undefined, (err) => { console.warn('GLTF load error', err); });
+          } catch (e) {
+            // dynamic import or load failed — keep procedural cup
+            console.warn('GLTFLoader import failed', e);
+          }
+        })();
 
         // Cup rim (torus)
         const rimGeo = new THREE.TorusGeometry(1.95, 0.12, 16, 64);
@@ -221,6 +243,12 @@
         const LEAF_COUNT = (cfg.visual && cfg.visual.leafCount) ? cfg.visual.leafCount : 96;
         const leafGeo = new THREE.PlaneGeometry(0.8, 0.36);
         const leafMat = new THREE.MeshStandardMaterial({ color: 0x9fd67b, roughness: 0.6, metalness: 0.02, side: THREE.DoubleSide });
+        // try loading a light leaf texture to give the leaves subtle detail
+        try {
+          const texLoader = new THREE.TextureLoader();
+          texLoader.crossOrigin = '';
+          texLoader.load('https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=256&q=80', (tex) => { leafMat.map = tex; leafMat.map.encoding = THREE.sRGBEncoding; leafMat.needsUpdate = true; }, undefined, () => { /* ignore */ });
+        } catch (e) { /* ignore */ }
         const leaves = new THREE.InstancedMesh(leafGeo, leafMat, LEAF_COUNT);
         leaves.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
         root.add(leaves);
