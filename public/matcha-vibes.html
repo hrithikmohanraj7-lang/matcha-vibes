@@ -9,15 +9,77 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --paper:#f5f1e8; --muted:rgba(245,241,232,.62); --green:#c8e86a; --brown:#7c5639; --black:#050505; }
+    :root { --paper:#f5f1e8; --muted:rgba(245,241,232,.62); --green:#c8e86a; --brown:#7c5639; --black:#050505; /* animation tunables (will be set by MCP) */ --anim-duration: 600ms; --card-stagger: 90ms; --btn-press-scale: 0.96; --header-slide: 700ms; }
     * { box-sizing:border-box; } html { scroll-behavior:smooth; background:var(--black); } body { margin:0; color:var(--paper); background:var(--black); font-family:Manrope,sans-serif; }
-    a { color:inherit; } .loader { position:fixed; inset:0; z-index:20; display:grid; place-content:center; gap:18px; background:var(--black); transition:opacity .7s,visibility .7s; }.loaded .loader { opacity:0; visibility:hidden; pointer-events:none; }.loader b { color:var(--green); font:14px 'DM Mono',monospace; letter-spacing:.15em; text-align:center; }.loader-line { width:min(260px,70vw); height:1px; background:#ffffff33; }.loader-line i { display:block; height:100%; background:var(--green); transition:width .2s; }.loader p,.eyebrow { color:var(--muted); font:10px 'DM Mono',monospace; letter-spacing:.13em; text-transform:uppercase; }
-    header { position:absolute; z-index:5; top:0; left:0; display:flex; justify-content:space-between; width:100%; padding:25px 4vw; font:10px 'DM Mono',monospace; letter-spacing:.1em; text-transform:uppercase; animation:dropIn .9s both; } header a { text-decoration:none; transition:color .25s; } header a:hover { color:var(--green); } header strong { color:var(--green); }.hero-scroll { height:400vh; }.hero { position:sticky; top:0; height:100vh; overflow:hidden; background:var(--black); }.hero canvas { position:absolute; inset:0; z-index:0; width:100%; height:100%; }.hero:after { content:''; position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.05; background:repeating-linear-gradient(0deg,transparent 0 3px,#fff 4px); }.hero-copy { position:absolute; z-index:2; top:24%; left:7.5%; animation:riseIn 1.1s .25s both; }.hero-copy h1,.section-title { margin:0; font-size:clamp(62px,10vw,155px); line-height:.82; letter-spacing:-.08em; }.hero-copy em,.section-title em { color:var(--green); font-family:Caveat,cursive; font-weight:600; letter-spacing:-.02em; }.hero-copy p:last-child { margin:28px 0; color:var(--muted); font-size:13px; line-height:1.7; }.scroll-note { position:absolute; z-index:2; bottom:30px; left:7.5%; color:var(--muted); font:10px 'DM Mono',monospace; letter-spacing:.1em; text-transform:uppercase; }.scroll-note span { display:inline-block; width:30px; height:1px; margin-right:10px; vertical-align:middle; background:var(--green); }.hero-meta { position:absolute; z-index:2; right:7.5%; bottom:30px; display:flex; gap:20px; color:var(--muted); font:9px 'DM Mono',monospace; letter-spacing:.08em; text-transform:uppercase; }.hero-meta span+span { padding-left:20px; border-left:1px solid #fff4; }
-    section:not(.hero) { border-top:1px solid #fff2; }.shop,.workshop { display:grid; grid-template-columns:1fr 1fr; gap:10vw; padding:14vw 7.5%; min-height:75vh; }.shop .copy p:last-child,.workshop .copy p:last-child { max-width:320px; margin-top:50px; color:var(--muted); font-size:14px; line-height:1.8; }.details { align-self:end; padding:30px; border:1px solid #c8e86a66; }.details div { margin-bottom:26px; }.details b { color:var(--green); font:12px 'DM Mono',monospace; letter-spacing:.12em; }.details p { margin:8px 0 0; color:var(--muted); font:12px 'DM Mono',monospace; line-height:1.7; }.details a,.cta { display:inline-block; margin-top:10px; font:11px 'DM Mono',monospace; text-transform:uppercase; text-decoration:none; }
-    .menu { padding:14vw 7.5%; }.menu-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:80px; }.card { min-height:390px; padding:24px; color:#142019; transform:translateY(35px); opacity:0; transition:transform .7s,opacity .7s,box-shadow .3s; }.card.visible { transform:none; opacity:1; }.card:hover { transform:translateY(-12px) rotate(-1deg); box-shadow:0 25px 55px #c8e86a22; }.card:nth-child(2):hover { transform:translateY(-12px) rotate(1deg); }.card > span { font:10px 'DM Mono',monospace; text-transform:uppercase; }.card .orb { position:relative; display:grid; place-items:center; width:150px; height:150px; margin:42px auto 35px; overflow:hidden; border-radius:50%; color:var(--paper); background:#44634c; box-shadow:inset -15px -20px 30px #0004,0 12px 30px #0002; font-size:35px; }.card .orb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; mix-blend-mode:screen; opacity:.72; transition:transform .6s; }.card:hover .orb img { transform:scale(1.16) rotate(8deg); }.card .orb span { position:relative; z-index:1; font:35px Manrope,sans-serif; }.card h3 { margin:0; font-size:24px; letter-spacing:-.05em; }.card p { max-width:240px; font-size:12px; line-height:1.6; }.green { background:#b5d883; }.cream { background:#faefd5; }.cream .orb { background:#c99f68; }.brown { color:var(--paper); background:var(--brown); }.brown .orb { background:#2f3e46; }
-    .workshop { background:#101713; }.cta { padding:16px 22px; border:1px solid #c8e86aaa; color:var(--paper); transition:background .3s,color .3s; }.cta:hover { color:var(--black); background:var(--green); }.final { min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:8vw 7.5% 30px; text-align:center; background:radial-gradient(circle at 50% 35%,#53672538,transparent 38%),var(--black); }.final .section-title { font-size:clamp(75px,12vw,180px); }.final small { margin:25px 0 0; color:var(--muted); font:30px Caveat,cursive; }.final footer { display:flex; justify-content:space-between; width:100%; margin-top:auto; padding-top:70px; color:#fff6; font:9px 'DM Mono',monospace; letter-spacing:.08em; text-transform:uppercase; }
-    @keyframes dropIn { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:none; } } @keyframes riseIn { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
-    @media(max-width:700px) { header { padding:20px; } header .location { display:none; }.hero-copy { left:20px; top:25%; }.hero-copy h1 { font-size:clamp(62px,19vw,110px); }.hero-meta { right:20px; bottom:65px; left:20px; justify-content:space-between; gap:6px; font-size:8px; }.hero-meta span+span { padding-left:6px; }.shop,.workshop { display:block; padding:100px 20px; }.shop .copy p:last-child,.workshop .copy p:last-child { margin-top:55px; }.details { margin-top:70px; }.menu { padding:100px 20px; }.menu-cards { grid-template-columns:1fr; margin-top:60px; }.card { min-height:330px; }.final { padding-inline:20px; }.final footer { flex-direction:column; gap:12px; } }
+    a { color:inherit; }
+
+    /* Loader */
+    .loader { position:fixed; inset:0; z-index:20; display:grid; place-content:center; gap:18px; background:var(--black); transition:opacity .7s,visibility .7s; }
+    .loaded .loader { opacity:0; visibility:hidden; pointer-events:none; }
+    .loader b { color:var(--green); font:14px 'DM Mono',monospace; letter-spacing:.15em; text-align:center; }
+    .loader-line { width:min(320px,78vw); height:2px; background:#ffffff22; border-radius:2px; overflow:hidden; }
+    .loader-line i { display:block; height:100%; background:linear-gradient(90deg,var(--green),#aee87a); transition:width .2s; }
+    .loader p,.eyebrow { color:var(--muted); font:10px 'DM Mono',monospace; letter-spacing:.13em; text-transform:uppercase; }
+
+    /* Header */
+    header { position:fixed; z-index:40; top:18px; left:0; right:0; display:flex; align-items:center; justify-content:space-between; width:100%; padding:14px 4vw; font:10px 'DM Mono',monospace; letter-spacing:.1em; text-transform:uppercase; pointer-events:auto; transition:transform var(--header-slide) cubic-bezier(.2,.9,.2,1), background .3s; transform:translateY(-8px) scale(0.995); }
+    header.header-visible { transform:none; }
+    header a { text-decoration:none; transition:color .25s,transform .25s; position:relative; }
+    header a::after { content:''; position:absolute; left:0; right:0; bottom:-6px; height:2px; background:var(--green); transform:scaleX(0); transform-origin:left center; transition:transform .28s cubic-bezier(.2,.9,.2,1); opacity:0.9; }
+    header a:hover::after { transform:scaleX(1); }
+    header .location { opacity:.9; }
+
+    /* Hero */
+    .hero-scroll { height:400vh; }
+    .hero { position:sticky; top:0; height:100vh; overflow:hidden; background:var(--black); }
+    .hero canvas { position:absolute; inset:0; z-index:0; width:100%; height:100%; }
+    .hero:after { content:''; position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.05; background:repeating-linear-gradient(0deg,transparent 0 3px,#fff 4px); }
+    .hero-copy { position:absolute; z-index:2; top:24%; left:7.5%; animation:riseIn 1.1s .25s both; }
+
+    /* Section basics preserved */
+    section:not(.hero) { border-top:1px solid #fff2; }
+    .shop,.workshop { display:grid; grid-template-columns:1fr 1fr; gap:10vw; padding:14vw 7.5%; min-height:75vh; }
+
+    /* Menu / Cards - enhanced */
+    .menu { padding:14vw 7.5%; }
+    .menu-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:80px; perspective:1200px; }
+    .card { min-height:390px; padding:24px; color:#142019; transform:translateY(36px) translateZ(0); opacity:0; transition:transform var(--anim-duration) cubic-bezier(.2,.9,.2,1),opacity var(--anim-duration) ease,box-shadow .3s; will-change:transform,opacity; background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0)); border-radius:8px; }
+    .card.visible { transform:translateY(0) translateZ(0) rotateX(0deg); opacity:1; box-shadow:0 30px 60px #0005; }
+    .card:hover { transform:translateY(-14px) rotateX(2deg) translateZ(2px); box-shadow:0 45px 90px #0008; }
+    .card > span { font:10px 'DM Mono',monospace; text-transform:uppercase; }
+    .card .orb { position:relative; display:grid; place-items:center; width:150px; height:150px; margin:42px auto 35px; overflow:hidden; border-radius:50%; color:var(--paper); background:#44634c; box-shadow:inset -15px -20px 30px #0004,0 12px 30px #0002; font-size:35px; }
+    .card .orb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; mix-blend-mode:screen; opacity:.84; transition:transform .6s; }
+    .card:hover .orb img { transform:scale(1.2) rotate(8deg); }
+
+    /* Buttons / CTA micro-interactions */
+    .cta, .reserve-button { display:inline-block; padding:14px 20px; border-radius:8px; background:linear-gradient(180deg,#1a2,#0f1); color:var(--paper); border:1px solid rgba(255,255,255,0.06); cursor:pointer; transform:translateZ(0); transition:transform 200ms cubic-bezier(.2,.9,.2,1), box-shadow 200ms; }
+    .cta:hover, .reserve-button:hover { transform:translateY(-6px) scale(1.02); box-shadow:0 18px 45px #0006; }
+    .cta:active, .reserve-button:active { transform:scale(var(--btn-press-scale)); }
+    .ripple { position:absolute; border-radius:50%; transform:translate(-50%,-50%) scale(0); background:rgba(255,255,255,0.14); pointer-events:none; }
+
+    /* Footer / final */
+    .final { min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:8vw 7.5% 30px; text-align:center; background:radial-gradient(circle at 50% 35%,#53672538,transparent 38%),var(--black); }
+    .final .section-title { font-size:clamp(75px,12vw,180px); }
+    .final small { margin:25px 0 0; color:var(--muted); font:30px Caveat,cursive; }
+    .final footer { display:flex; justify-content:space-between; width:100%; margin-top:auto; padding-top:70px; color:#fff6; font:9px 'DM Mono',monospace; letter-spacing:.08em; text-transform:uppercase; }
+
+    /* Utilities */
+    @keyframes dropIn { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:none; } }
+    @keyframes riseIn { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+
+    @media(max-width:700px) {
+      header { padding:12px 16px; }
+      header .location { display:none; }
+      .hero-copy { left:20px; top:25%; }
+      .hero-copy h1 { font-size:clamp(62px,19vw,110px); }
+      .hero-meta { right:20px; bottom:65px; left:20px; justify-content:space-between; gap:6px; font-size:8px; }
+      .shop,.workshop { display:block; padding:100px 20px; }
+      .menu { padding:100px 20px; }
+      .menu-cards { grid-template-columns:1fr; margin-top:60px; }
+      .card { min-height:330px; }
+      .final { padding-inline:20px; }
+      .final footer { flex-direction:column; gap:12px; }
+    }
   </style>
 </head>
 <body>
@@ -33,165 +95,207 @@
   <script type="module">
     import * as THREE from 'https://unpkg.com/three@0.185.1/build/three.module.js';
 
+    // MCP endpoint (from workspace config)
+    const MCP_URL = 'https://xgdzyqfalbibzelpdpvr.supabase.co/functions/v1/mcp';
+
+    // Default animation config (used if MCP fetch fails)
+    const defaultConfig = {
+      header: { duration: 700, easing: 'cubic-bezier(.2,.9,.2,1)' },
+      card: { stagger: 90, duration: 640 },
+      button: { pressScale: 0.96, hoverLift: 1.02 },
+      visual: { leafCount: 96 }
+    };
+
+    // Apply animation config to CSS variables
+    function applyConfigToCSS(cfg) {
+      try {
+        const root = document.documentElement;
+        if (cfg.header && cfg.header.duration) root.style.setProperty('--header-slide', cfg.header.duration + 'ms');
+        if (cfg.card && cfg.card.stagger) root.style.setProperty('--card-stagger', cfg.card.stagger + 'ms');
+        if (cfg.button && cfg.button.pressScale) root.style.setProperty('--btn-press-scale', cfg.button.pressScale);
+        if (cfg.card && cfg.card.duration) root.style.setProperty('--anim-duration', cfg.card.duration + 'ms');
+      } catch (e) { /* ignore */ }
+    }
+
+    async function fetchMCPConfig() {
+      try {
+        const res = await fetch(MCP_URL, { method: 'GET' });
+        if (!res.ok) throw new Error('mcp fetch failed');
+        const json = await res.json();
+        // Expecting structure like { animations: { header: {...}, card:{...}, button:{...} } }
+        const cfg = (json && json.animations) ? json.animations : json;
+        return Object.assign({}, defaultConfig, cfg || {});
+      } catch (err) {
+        return defaultConfig;
+      }
+    }
+
     // Elements
     const canvas = document.getElementById('sequence');
     const loaderBar = document.getElementById('loadBar');
     const loaderText = document.getElementById('loadText');
-    const loaderEl = document.querySelector('.loader');
 
-    // Mobile/user-agent check: use the original sequence fallback for mobile or when WebGL unavailable
-    const isMobile = /Mobi|Android|iPhone|iPad|Tablet/i.test(navigator.userAgent || '');
-    const supportWebGL = (() => { try { const gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl'); return !!gl; } catch (e) { return false; } })();
+    // Start by fetching MCP-driven config, then init scene and UI
+    (async function init() {
+      const cfg = await fetchMCPConfig();
+      applyConfigToCSS(cfg);
+      initHeroAndUI(cfg);
+    })();
 
-    if (!supportWebGL || isMobile) {
-      // Fallback: original image sequence timeline for mobile or no-WebGL
-      (function(){
-        const total = 168;
-        const images = [];
-        const ctx = canvas.getContext('2d');
-        const bar = loaderBar, text = loaderText; let loaded = 0, frame = 0, ready = false;
-        function resize(){ const ratio = Math.min(devicePixelRatio||1,2); canvas.width = innerWidth * ratio; canvas.height = innerHeight * ratio; canvas.style.width = innerWidth + 'px'; canvas.style.height = innerHeight + 'px'; draw(frame); }
-        function draw(index){ const image = images[index]; if(!image||!image.naturalWidth) return; const ratio = Math.min(innerWidth/image.naturalWidth, innerHeight/image.naturalHeight), w = image.naturalWidth * ratio, h = image.naturalHeight * ratio, scale = Math.min(devicePixelRatio||1,2); ctx.setTransform(scale,0,0,scale,0,0); ctx.clearRect(0,0,innerWidth,innerHeight); ctx.drawImage(image,(innerWidth-w)/2,(innerHeight-h)/2,w,h); }
-        for(let i=1;i<=total;i++){ const image = new Image(); image.src = '/sequence/ezgif-frame-' + String(i).padStart(3,'0') + '.jpg'; image.onload = () => { loaded++; if(bar) bar.style.width = (loaded/total*100) + '%'; if(text) text.textContent = Math.round(loaded/total*100) + '%'; if(loaded === total){ ready = true; document.body.classList.add('loaded'); draw(0); } }; images.push(image); }
-        addEventListener('resize', resize); addEventListener('scroll', ()=>{ if(!ready) return; const hero = document.querySelector('.hero-scroll'); const progress = Math.max(0, Math.min(1, (scrollY - hero.offsetTop) / (hero.offsetHeight - innerHeight))); const next = Math.round(progress * (total - 1)); if(next !== frame){ frame = next; draw(frame); } }); resize();
-      })();
+    function initHeroAndUI(cfg) {
+      // Mobile/user-agent check: use the original sequence fallback for mobile or when WebGL unavailable
+      const isMobile = /Mobi|Android|iPhone|iPad|Tablet/i.test(navigator.userAgent || '');
+      const supportWebGL = (() => { try { const gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl'); return !!gl; } catch (e) { return false; } })();
 
-    } else {
-      // WebGL-enhanced scene for desktop
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.outputEncoding = THREE.sRGBEncoding;
+      if (!supportWebGL || isMobile) {
+        // Fallback: original image sequence timeline for mobile or no-WebGL
+        (function(){
+          const total = 168;
+          const images = [];
+          const ctx = canvas.getContext('2d');
+          const bar = loaderBar, text = loaderText; let loaded = 0, frame = 0, ready = false;
+          function resize(){ const ratio = Math.min(devicePixelRatio||1,2); canvas.width = innerWidth * ratio; canvas.height = innerHeight * ratio; canvas.style.width = innerWidth + 'px'; canvas.style.height = innerHeight + 'px'; draw(frame); }
+          function draw(index){ const image = images[index]; if(!image||!image.naturalWidth) return; const ratio = Math.min(innerWidth/image.naturalWidth, innerHeight/image.naturalHeight), w = image.naturalWidth * ratio, h = image.naturalHeight * ratio, scale = Math.min(devicePixelRatio||1,2); ctx.setTransform(scale,0,0,scale,0,0); ctx.clearRect(0,0,innerWidth,innerHeight); ctx.drawImage(image,(innerWidth-w)/2,(innerHeight-h)/2,w,h); }
+          for(let i=1;i<=total;i++){ const image = new Image(); image.src = '/sequence/ezgif-frame-' + String(i).padStart(3,'0') + '.jpg'; image.onload = () => { loaded++; if(bar) bar.style.width = (loaded/total*100) + '%'; if(text) text.textContent = Math.round(loaded/total*100) + '%'; if(loaded === total){ ready = true; document.body.classList.add('loaded'); draw(0); } }; images.push(image); }
+          addEventListener('resize', resize); addEventListener('scroll', ()=>{ if(!ready) return; const hero = document.querySelector('.hero-scroll'); const progress = Math.max(0, Math.min(1, (scrollY - hero.offsetTop) / (hero.offsetHeight - innerHeight))); const next = Math.round(progress * (total - 1)); if(next !== frame){ frame = next; draw(frame); } }); resize();
+        })();
 
-      const scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x000000, 0.02);
+      } else {
+        // WebGL-enhanced scene for desktop
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.outputEncoding = THREE.sRGBEncoding;
 
-      const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);
-      camera.position.set(0, 0, 12);
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.02);
 
-      // Root group for parallax
-      const root = new THREE.Group();
-      scene.add(root);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);
+        camera.position.set(0, 0, 12);
 
-      // Lighting
-      const ambient = new THREE.AmbientLight(0xffffff, 0.55);
-      scene.add(ambient);
-      const key = new THREE.DirectionalLight(0xfff7e6, 0.6);
-      key.position.set(6, 6, 10);
-      scene.add(key);
-      const rim = new THREE.DirectionalLight(0x9fe17a, 0.25);
-      rim.position.set(-6, -4, -6);
-      scene.add(rim);
+        // Root group for parallax
+        const root = new THREE.Group();
+        scene.add(root);
 
-      // Create a simple stylized cup
-      const cupGroup = new THREE.Group();
-      root.add(cupGroup);
+        // Lighting
+        const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+        scene.add(ambient);
+        const key = new THREE.DirectionalLight(0xfff7e6, 0.6);
+        key.position.set(6, 6, 10);
+        scene.add(key);
+        const rim = new THREE.DirectionalLight(0x9fe17a, 0.25);
+        rim.position.set(-6, -4, -6);
+        scene.add(rim);
 
-      // Cup body (cylinder with inverted normals)
-      const cupGeo = new THREE.CylinderGeometry(2.2, 2.3, 1.6, 32, 1, true);
-      const cupMat = new THREE.MeshStandardMaterial({ color: 0xf2f1ea, roughness: 0.6, metalness: 0.05, side: THREE.DoubleSide });
-      const cupBody = new THREE.Mesh(cupGeo, cupMat);
-      cupBody.position.y = -0.4;
-      cupBody.rotation.x = Math.PI;
-      cupGroup.add(cupBody);
+        // Create a simple stylized cup
+        const cupGroup = new THREE.Group();
+        root.add(cupGroup);
 
-      // Cup rim (torus)
-      const rimGeo = new THREE.TorusGeometry(1.95, 0.12, 16, 64);
-      const rimMat = new THREE.MeshStandardMaterial({ color: 0xedf5e6, roughness: 0.45, metalness: 0.02 });
-      const rimMesh = new THREE.Mesh(rimGeo, rimMat);
-      rimMesh.rotation.x = Math.PI / 2;
-      rimMesh.position.y = 0.4;
-      cupGroup.add(rimMesh);
+        // Cup body (cylinder with inverted normals)
+        const cupGeo = new THREE.CylinderGeometry(2.2, 2.3, 1.6, 32, 1, true);
+        const cupMat = new THREE.MeshStandardMaterial({ color: 0xf2f1ea, roughness: 0.6, metalness: 0.05, side: THREE.DoubleSide });
+        const cupBody = new THREE.Mesh(cupGeo, cupMat);
+        cupBody.position.y = -0.4;
+        cupBody.rotation.x = Math.PI;
+        cupGroup.add(cupBody);
 
-      // Liquid (green sphere clipped) - simple approximation
-      const liquidGeo = new THREE.CircleGeometry(1.85, 64);
-      const liquidMat = new THREE.MeshStandardMaterial({ color: 0x76c752, roughness: 0.4, metalness: 0.02 });
-      const liquid = new THREE.Mesh(liquidGeo, liquidMat);
-      liquid.rotation.x = -Math.PI / 2;
-      liquid.position.y = 0.41;
-      cupGroup.add(liquid);
+        // Cup rim (torus)
+        const rimGeo = new THREE.TorusGeometry(1.95, 0.12, 16, 64);
+        const rimMat = new THREE.MeshStandardMaterial({ color: 0xedf5e6, roughness: 0.45, metalness: 0.02 });
+        const rimMesh = new THREE.Mesh(rimGeo, rimMat);
+        rimMesh.rotation.x = Math.PI / 2;
+        rimMesh.position.y = 0.4;
+        cupGroup.add(rimMesh);
 
-      cupGroup.position.set(0, -0.4, 0);
+        // Liquid (green sphere clipped) - simple approximation
+        const liquidGeo = new THREE.CircleGeometry(1.85, 64);
+        const liquidMat = new THREE.MeshStandardMaterial({ color: 0x76c752, roughness: 0.4, metalness: 0.02 });
+        const liquid = new THREE.Mesh(liquidGeo, liquidMat);
+        liquid.rotation.x = -Math.PI / 2;
+        liquid.position.y = 0.41;
+        cupGroup.add(liquid);
 
-      // Floating leaves: instanced planes with subtle rotation
-      const LEAF_COUNT = 96;
-      const leafGeo = new THREE.PlaneGeometry(0.8, 0.36);
-      const leafMat = new THREE.MeshStandardMaterial({ color: 0x9fd67b, roughness: 0.6, metalness: 0.02, side: THREE.DoubleSide });
-      const leaves = new THREE.InstancedMesh(leafGeo, leafMat, LEAF_COUNT);
-      leaves.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-      root.add(leaves);
+        cupGroup.position.set(0, -0.4, 0);
 
-      // Per-instance state
-      const dummy = new THREE.Object3D();
-      const leafState = [];
-      for (let i = 0; i < LEAF_COUNT; i++) {
-        const x = (Math.random() * 2 - 1) * 8;
-        const y = (Math.random() * 2 - 1) * 6;
-        const z = (Math.random() * 2 - 1) * 6;
-        const s = 0.6 + Math.random() * 1.2;
-        const ry = (Math.random() - 0.5) * 2;
-        dummy.position.set(x, y, z);
-        dummy.rotation.set((Math.random() - 0.5) * 0.6, (Math.random() - 0.5) * 0.6, Math.random() * Math.PI * 2);
-        dummy.scale.set(s, s, s);
-        dummy.updateMatrix();
-        leaves.setMatrixAt(i, dummy.matrix);
-        leafState.push({ x, y, z, s, ry, speed: 0.2 + Math.random() * 0.6, rotSpeed: 0.2 + Math.random() * 0.6 });
-      }
-      leaves.instanceMatrix.needsUpdate = true;
+        // Floating leaves: instanced planes with subtle rotation
+        const LEAF_COUNT = (cfg.visual && cfg.visual.leafCount) ? cfg.visual.leafCount : 96;
+        const leafGeo = new THREE.PlaneGeometry(0.8, 0.36);
+        const leafMat = new THREE.MeshStandardMaterial({ color: 0x9fd67b, roughness: 0.6, metalness: 0.02, side: THREE.DoubleSide });
+        const leaves = new THREE.InstancedMesh(leafGeo, leafMat, LEAF_COUNT);
+        leaves.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+        root.add(leaves);
 
-      // Mouse parallax
-      const mouse = { x: 0, y: 0 };
-      const target = { x: 0, y: 0 };
-      window.addEventListener('pointermove', (e) => {
-        const nx = (e.clientX / innerWidth) * 2 - 1;
-        const ny = (e.clientY / innerHeight) * 2 - 1;
-        target.x = nx * 0.6;
-        target.y = -ny * 0.35;
-      });
-
-      // Resize
-      function onResize() {
-        camera.aspect = innerWidth / innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(innerWidth, innerHeight);
-      }
-      addEventListener('resize', onResize, { passive: true });
-
-      // Gentle camera movement
-      const clock = new THREE.Clock();
-
-      // Reveal loader quickly once scene is warm
-      let warmFrames = 0;
-
-      function animate() {
-        const dt = clock.getDelta();
-        // lerp mouse
-        mouse.x += (target.x - mouse.x) * Math.min(1, dt * 5);
-        mouse.y += (target.y - mouse.y) * Math.min(1, dt * 5);
-        root.position.x = mouse.x * 4;
-        root.position.y = mouse.y * 2;
-
-        // bob the cup
-        const t = clock.elapsedTime;
-        cupGroup.rotation.z = Math.sin(t * 0.6) * 0.03;
-        cupGroup.position.y = -0.35 + Math.sin(t * 0.9) * 0.06;
-
-        // update leaves
+        // Per-instance state
+        const dummy = new THREE.Object3D();
+        const leafState = [];
         for (let i = 0; i < LEAF_COUNT; i++) {
-          const s = leafState[i];
-          s.y += s.speed * dt * 0.9;
-          s.x += Math.sin(t * 0.2 + i) * 0.002;
-          s.z += Math.cos(t * 0.15 + i * 0.7) * 0.001;
-          s.ry += s.rotSpeed * dt * 0.8;
-          if (s.y > 8) s.y = -8 - Math.random() * 2;
-          dummy.position.set(s.x, s.y, s.z);
-          dummy.rotation.set(0.2 * Math.sin(i + t * 0.5), 0.1 * Math.cos(i + t * 0.3), s.ry);
-          const scale = s.s * (0.8 + 0.2 * Math.sin(t * 0.7 + i));
-          dummy.scale.set(scale, scale, scale);
+          const x = (Math.random() * 2 - 1) * 8;
+          const y = (Math.random() * 2 - 1) * 6;
+          const z = (Math.random() * 2 - 1) * 6;
+          const s = 0.6 + Math.random() * 1.2;
+          const ry = (Math.random() - 0.5) * 2;
+          dummy.position.set(x, y, z);
+          dummy.rotation.set((Math.random() - 0.5) * 0.6, (Math.random() - 0.5) * 0.6, Math.random() * Math.PI * 2);
+          dummy.scale.set(s, s, s);
           dummy.updateMatrix();
           leaves.setMatrixAt(i, dummy.matrix);
+          leafState.push({ x, y, z, s, ry, speed: 0.2 + Math.random() * 0.6, rotSpeed: 0.2 + Math.random() * 0.6 });
         }
         leaves.instanceMatrix.needsUpdate = true;
+
+        // Mouse parallax
+        const mouse = { x: 0, y: 0 };
+        const target = { x: 0, y: 0 };
+        window.addEventListener('pointermove', (e) => {
+          const nx = (e.clientX / innerWidth) * 2 - 1;
+          const ny = (e.clientY / innerHeight) * 2 - 1;
+          target.x = nx * 0.6;
+          target.y = -ny * 0.35;
+        });
+
+        // Resize
+        function onResize() {
+          camera.aspect = innerWidth / innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(innerWidth, innerHeight);
+        }
+        addEventListener('resize', onResize, { passive: true });
+
+        // Gentle camera movement
+        const clock = new THREE.Clock();
+
+        // Reveal loader quickly once scene is warm
+        let warmFrames = 0;
+
+        function animate() {
+          const dt = clock.getDelta();
+          // lerp mouse
+          mouse.x += (target.x - mouse.x) * Math.min(1, dt * 5);
+          mouse.y += (target.y - mouse.y) * Math.min(1, dt * 5);
+          root.position.x = mouse.x * 4;
+          root.position.y = mouse.y * 2;
+
+          // bob the cup
+          const t = clock.elapsedTime;
+          cupGroup.rotation.z = Math.sin(t * 0.6) * 0.03;
+          cupGroup.position.y = -0.35 + Math.sin(t * 0.9) * 0.06;
+
+          // update leaves
+          for (let i = 0; i < LEAF_COUNT; i++) {
+            const s = leafState[i];
+            s.y += s.speed * dt * 0.9;
+            s.x += Math.sin(t * 0.2 + i) * 0.002;
+            s.z += Math.cos(t * 0.15 + i * 0.7) * 0.001;
+            s.ry += s.rotSpeed * dt * 0.8;
+            if (s.y > 8) s.y = -8 - Math.random() * 2;
+            dummy.position.set(s.x, s.y, s.z);
+            dummy.rotation.set(0.2 * Math.sin(i + t * 0.5), 0.1 * Math.cos(i + t * 0.3), s.ry);
+            const scale = s.s * (0.8 + 0.2 * Math.sin(t * 0.7 + i));
+            dummy.scale.set(scale, scale, scale);
+            dummy.updateMatrix();
+            leaves.setMatrixAt(i, dummy.matrix);
+          }
+          leaves.instanceMatrix.needsUpdate = true;
 
         renderer.render(scene, camera);
 
@@ -210,9 +314,49 @@
       // Start
       animate();
 
-      // Intersection animations for cards (kept from original)
-      const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible') }), { threshold: .2 });
+      // Intersection animations for cards (staggered using --card-stagger)
+      const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const card = entry.target;
+          const all = Array.from(document.querySelectorAll('.card'));
+          const idx = all.indexOf(card);
+          const base = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-stagger')) || 90;
+          card.style.transitionDelay = (idx * base) + 'ms';
+          card.classList.add('visible');
+        }
+      }), { threshold: .18 });
       document.querySelectorAll('.card').forEach(card => observer.observe(card));
+
+      // Header reveal
+      const header = document.querySelector('header');
+      setTimeout(() => header && header.classList.add('header-visible'), 160);
+
+      // Button ripple microinteraction
+      function createRipple(e) {
+        const target = e.currentTarget;
+        const rect = target.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        ripple.style.width = ripple.style.height = Math.max(rect.width, rect.height) + 'px';
+        ripple.style.left = (e.clientX - rect.left) + 'px';
+        ripple.style.top = (e.clientY - rect.top) + 'px';
+        target.style.position = 'relative';
+        target.appendChild(ripple);
+        requestAnimationFrame(() => { ripple.style.transform = 'translate(-50%,-50%) scale(1)'; ripple.style.opacity = '1'; ripple.style.transition = 'transform 480ms cubic-bezier(.2,.9,.2,1), opacity 480ms ease'; });
+        setTimeout(() => { ripple.style.opacity = '0'; }, 380);
+        setTimeout(() => { ripple.remove(); }, 900);
+      }
+      document.querySelectorAll('.cta, .reserve-button, header a').forEach(el => el.addEventListener('pointerdown', createRipple));
+
+      // Header link hover animation (subtle lift)
+      document.querySelectorAll('header a').forEach(a => { a.addEventListener('mouseenter', () => a.style.transform = 'translateY(-2px)'); a.addEventListener('mouseleave', () => a.style.transform = ''); });
+
+      // Accessibility: reduce motion
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if (mq.matches) {
+        document.documentElement.style.setProperty('--anim-duration', '0ms');
+        document.querySelectorAll('.card').forEach(c => { c.style.transition = 'none'; c.classList.add('visible'); });
+      }
     }
   </script>
 </body>
