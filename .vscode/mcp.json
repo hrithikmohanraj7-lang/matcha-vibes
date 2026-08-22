@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "matcha-vibes-supabase": {
+      "type": "http",
+      "url": "https://xgdzyqfalbibzelpdpvr.supabase.co/functions/v1/mcp"
+    }
+  }
+}
