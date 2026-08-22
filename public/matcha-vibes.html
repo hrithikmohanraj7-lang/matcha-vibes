@@ -30,13 +30,190 @@
     <section class="workshop"><div class="copy"><p class="eyebrow">04 / The AED 300 experience</p><h2 class="section-title">Tea is a<br><em>practice.</em></h2><p>Kimono dressing, matcha whisking, DIY matcha face-mask making and an official certificate. A workshop worth slowing down for.</p><a class="cta" href="mailto:hello@matchavibes.ae">Reserve your seat ↗</a></div><div class="details"><div><b>Workshop / AED 300</b><p>Small group sessions in Dubai</p></div><div><b>Order online</b><p>Message us for delivery and availability</p></div><a href="mailto:hello@matchavibes.ae">Contact Matcha Vibes ↗</a></div></section>
     <section class="final" id="reserve"><p class="eyebrow">Matcha Vibes Cafe / ماتشا كافيه</p><h2 class="section-title">Come for the<br><em>matcha.</em></h2><small>Stay for the feeling.</small><a class="cta" href="mailto:hello@matchavibes.ae">Book workshop / AED 300 ↗</a><footer><span>© Matcha Vibes Cafe</span><span>The Village Mall · Jumeirah 1</span><span>Dubai, UAE</span></footer></section>
   </main>
-  <script>
-    const total=168, images=[], canvas=document.getElementById('sequence'), ctx=canvas.getContext('2d'), bar=document.getElementById('loadBar'), text=document.getElementById('loadText'); let loaded=0, frame=0, ready=false;
-    function resize(){ const ratio=Math.min(devicePixelRatio||1,2); canvas.width=innerWidth*ratio; canvas.height=innerHeight*ratio; canvas.style.width=innerWidth+'px'; canvas.style.height=innerHeight+'px'; draw(frame); }
-    function draw(index){ const image=images[index]; if(!image||!image.naturalWidth)return; const ratio=Math.min(innerWidth/image.naturalWidth,innerHeight/image.naturalHeight), w=image.naturalWidth*ratio, h=image.naturalHeight*ratio, scale=Math.min(devicePixelRatio||1,2); ctx.setTransform(scale,0,0,scale,0,0); ctx.clearRect(0,0,innerWidth,innerHeight); ctx.drawImage(image,(innerWidth-w)/2,(innerHeight-h)/2,w,h); }
-    for(let i=1;i<=total;i++){ const image=new Image(); image.src='/sequence/ezgif-frame-'+String(i).padStart(3,'0')+'.jpg'; image.onload=()=>{ loaded++; bar.style.width=(loaded/total*100)+'%'; text.textContent=Math.round(loaded/total*100)+'%'; if(loaded===total){ ready=true; document.body.classList.add('loaded'); draw(0); } }; images.push(image); }
-    addEventListener('resize',resize); addEventListener('scroll',()=>{ if(!ready)return; const hero=document.querySelector('.hero-scroll'), progress=Math.max(0,Math.min(1,(scrollY-hero.offsetTop)/(hero.offsetHeight-innerHeight))); const next=Math.round(progress*(total-1)); if(next!==frame){frame=next;draw(frame);} }); resize();
-    const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting)entry.target.classList.add('visible')}),{threshold:.2}); document.querySelectorAll('.card').forEach(card=>observer.observe(card));
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.185.1/build/three.module.js';
+
+    // Elements
+    const canvas = document.getElementById('sequence');
+    const loaderBar = document.getElementById('loadBar');
+    const loaderText = document.getElementById('loadText');
+    const loaderEl = document.querySelector('.loader');
+
+    // Mobile/user-agent check: use the original sequence fallback for mobile or when WebGL unavailable
+    const isMobile = /Mobi|Android|iPhone|iPad|Tablet/i.test(navigator.userAgent || '');
+    const supportWebGL = (() => { try { const gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl'); return !!gl; } catch (e) { return false; } })();
+
+    if (!supportWebGL || isMobile) {
+      // Fallback: original image sequence timeline for mobile or no-WebGL
+      (function(){
+        const total = 168;
+        const images = [];
+        const ctx = canvas.getContext('2d');
+        const bar = loaderBar, text = loaderText; let loaded = 0, frame = 0, ready = false;
+        function resize(){ const ratio = Math.min(devicePixelRatio||1,2); canvas.width = innerWidth * ratio; canvas.height = innerHeight * ratio; canvas.style.width = innerWidth + 'px'; canvas.style.height = innerHeight + 'px'; draw(frame); }
+        function draw(index){ const image = images[index]; if(!image||!image.naturalWidth) return; const ratio = Math.min(innerWidth/image.naturalWidth, innerHeight/image.naturalHeight), w = image.naturalWidth * ratio, h = image.naturalHeight * ratio, scale = Math.min(devicePixelRatio||1,2); ctx.setTransform(scale,0,0,scale,0,0); ctx.clearRect(0,0,innerWidth,innerHeight); ctx.drawImage(image,(innerWidth-w)/2,(innerHeight-h)/2,w,h); }
+        for(let i=1;i<=total;i++){ const image = new Image(); image.src = '/sequence/ezgif-frame-' + String(i).padStart(3,'0') + '.jpg'; image.onload = () => { loaded++; if(bar) bar.style.width = (loaded/total*100) + '%'; if(text) text.textContent = Math.round(loaded/total*100) + '%'; if(loaded === total){ ready = true; document.body.classList.add('loaded'); draw(0); } }; images.push(image); }
+        addEventListener('resize', resize); addEventListener('scroll', ()=>{ if(!ready) return; const hero = document.querySelector('.hero-scroll'); const progress = Math.max(0, Math.min(1, (scrollY - hero.offsetTop) / (hero.offsetHeight - innerHeight))); const next = Math.round(progress * (total - 1)); if(next !== frame){ frame = next; draw(frame); } }); resize();
+      })();
+
+    } else {
+      // WebGL-enhanced scene for desktop
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.outputEncoding = THREE.sRGBEncoding;
+
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x000000, 0.02);
+
+      const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);
+      camera.position.set(0, 0, 12);
+
+      // Root group for parallax
+      const root = new THREE.Group();
+      scene.add(root);
+
+      // Lighting
+      const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+      scene.add(ambient);
+      const key = new THREE.DirectionalLight(0xfff7e6, 0.6);
+      key.position.set(6, 6, 10);
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0x9fe17a, 0.25);
+      rim.position.set(-6, -4, -6);
+      scene.add(rim);
+
+      // Create a simple stylized cup
+      const cupGroup = new THREE.Group();
+      root.add(cupGroup);
+
+      // Cup body (cylinder with inverted normals)
+      const cupGeo = new THREE.CylinderGeometry(2.2, 2.3, 1.6, 32, 1, true);
+      const cupMat = new THREE.MeshStandardMaterial({ color: 0xf2f1ea, roughness: 0.6, metalness: 0.05, side: THREE.DoubleSide });
+      const cupBody = new THREE.Mesh(cupGeo, cupMat);
+      cupBody.position.y = -0.4;
+      cupBody.rotation.x = Math.PI;
+      cupGroup.add(cupBody);
+
+      // Cup rim (torus)
+      const rimGeo = new THREE.TorusGeometry(1.95, 0.12, 16, 64);
+      const rimMat = new THREE.MeshStandardMaterial({ color: 0xedf5e6, roughness: 0.45, metalness: 0.02 });
+      const rimMesh = new THREE.Mesh(rimGeo, rimMat);
+      rimMesh.rotation.x = Math.PI / 2;
+      rimMesh.position.y = 0.4;
+      cupGroup.add(rimMesh);
+
+      // Liquid (green sphere clipped) - simple approximation
+      const liquidGeo = new THREE.CircleGeometry(1.85, 64);
+      const liquidMat = new THREE.MeshStandardMaterial({ color: 0x76c752, roughness: 0.4, metalness: 0.02 });
+      const liquid = new THREE.Mesh(liquidGeo, liquidMat);
+      liquid.rotation.x = -Math.PI / 2;
+      liquid.position.y = 0.41;
+      cupGroup.add(liquid);
+
+      cupGroup.position.set(0, -0.4, 0);
+
+      // Floating leaves: instanced planes with subtle rotation
+      const LEAF_COUNT = 96;
+      const leafGeo = new THREE.PlaneGeometry(0.8, 0.36);
+      const leafMat = new THREE.MeshStandardMaterial({ color: 0x9fd67b, roughness: 0.6, metalness: 0.02, side: THREE.DoubleSide });
+      const leaves = new THREE.InstancedMesh(leafGeo, leafMat, LEAF_COUNT);
+      leaves.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      root.add(leaves);
+
+      // Per-instance state
+      const dummy = new THREE.Object3D();
+      const leafState = [];
+      for (let i = 0; i < LEAF_COUNT; i++) {
+        const x = (Math.random() * 2 - 1) * 8;
+        const y = (Math.random() * 2 - 1) * 6;
+        const z = (Math.random() * 2 - 1) * 6;
+        const s = 0.6 + Math.random() * 1.2;
+        const ry = (Math.random() - 0.5) * 2;
+        dummy.position.set(x, y, z);
+        dummy.rotation.set((Math.random() - 0.5) * 0.6, (Math.random() - 0.5) * 0.6, Math.random() * Math.PI * 2);
+        dummy.scale.set(s, s, s);
+        dummy.updateMatrix();
+        leaves.setMatrixAt(i, dummy.matrix);
+        leafState.push({ x, y, z, s, ry, speed: 0.2 + Math.random() * 0.6, rotSpeed: 0.2 + Math.random() * 0.6 });
+      }
+      leaves.instanceMatrix.needsUpdate = true;
+
+      // Mouse parallax
+      const mouse = { x: 0, y: 0 };
+      const target = { x: 0, y: 0 };
+      window.addEventListener('pointermove', (e) => {
+        const nx = (e.clientX / innerWidth) * 2 - 1;
+        const ny = (e.clientY / innerHeight) * 2 - 1;
+        target.x = nx * 0.6;
+        target.y = -ny * 0.35;
+      });
+
+      // Resize
+      function onResize() {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      }
+      addEventListener('resize', onResize, { passive: true });
+
+      // Gentle camera movement
+      const clock = new THREE.Clock();
+
+      // Reveal loader quickly once scene is warm
+      let warmFrames = 0;
+
+      function animate() {
+        const dt = clock.getDelta();
+        // lerp mouse
+        mouse.x += (target.x - mouse.x) * Math.min(1, dt * 5);
+        mouse.y += (target.y - mouse.y) * Math.min(1, dt * 5);
+        root.position.x = mouse.x * 4;
+        root.position.y = mouse.y * 2;
+
+        // bob the cup
+        const t = clock.elapsedTime;
+        cupGroup.rotation.z = Math.sin(t * 0.6) * 0.03;
+        cupGroup.position.y = -0.35 + Math.sin(t * 0.9) * 0.06;
+
+        // update leaves
+        for (let i = 0; i < LEAF_COUNT; i++) {
+          const s = leafState[i];
+          s.y += s.speed * dt * 0.9;
+          s.x += Math.sin(t * 0.2 + i) * 0.002;
+          s.z += Math.cos(t * 0.15 + i * 0.7) * 0.001;
+          s.ry += s.rotSpeed * dt * 0.8;
+          if (s.y > 8) s.y = -8 - Math.random() * 2;
+          dummy.position.set(s.x, s.y, s.z);
+          dummy.rotation.set(0.2 * Math.sin(i + t * 0.5), 0.1 * Math.cos(i + t * 0.3), s.ry);
+          const scale = s.s * (0.8 + 0.2 * Math.sin(t * 0.7 + i));
+          dummy.scale.set(scale, scale, scale);
+          dummy.updateMatrix();
+          leaves.setMatrixAt(i, dummy.matrix);
+        }
+        leaves.instanceMatrix.needsUpdate = true;
+
+        renderer.render(scene, camera);
+
+        // Warm-up loader: show once a few frames have rendered
+        if (warmFrames++ < 30) {
+          const pct = Math.round(Math.min(1, warmFrames / 30) * 100);
+          if (loaderBar) loaderBar.style.width = pct + '%';
+          if (loaderText) loaderText.textContent = pct + '%';
+        } else if (!document.body.classList.contains('loaded')) {
+          document.body.classList.add('loaded');
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      // Start
+      animate();
+
+      // Intersection animations for cards (kept from original)
+      const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible') }), { threshold: .2 });
+      document.querySelectorAll('.card').forEach(card => observer.observe(card));
+    }
   </script>
 </body>
 </html>
