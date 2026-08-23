@@ -43,12 +43,15 @@
     .site-header .brand,.site-header .site-nav,.site-header .header-cta{visibility:visible}
     .orbit-nav__links{visibility:visible;opacity:1}
     .orbit-nav__links a:before,.orbit-nav__links a:after{content:none!important}
+    /* Post-hero GradientWaves layer: a lightweight matcha canvas band, never covering the landing hero. */
+    .posthero-wave{position:relative;z-index:3;height:28vh;min-height:210px;overflow:hidden;background:linear-gradient(180deg,var(--black),#10291e 55%,var(--paper));isolation:isolate}.posthero-wave:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 35%,var(--paper) 100%)}.posthero-wave canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:.95}.posthero-wave-label{position:absolute;z-index:2;right:7vw;bottom:28px;color:#d4ef89cc;font:9px var(--mono);letter-spacing:.16em;text-transform:uppercase}.posthero-wave-label:before{content:"";display:inline-block;width:28px;height:1px;margin:0 10px 3px 0;background:currentColor}.orbit-nav{box-shadow:0 8px 24px #07110e12}@media(max-width:800px){.posthero-wave{height:22vh;min-height:150px}.posthero-wave-label{right:20px;bottom:18px;font-size:8px}}@media(prefers-reduced-motion:reduce){.posthero-wave canvas{opacity:.72}}
   </style>
 </head>
 <body><div class="ambient-field" aria-hidden="true"></div><div class="interactive-cursor" aria-hidden="true"></div>
   <header class="site-header" id="siteHeader"><a class="brand" href="#hero">MATCHA <b>/</b> VIBES</a><nav class="site-nav"><a href="#story">Story</a><a href="#menu">Menu</a><a href="#workshop">Workshop</a><a href="#visit">Visit</a></nav><a class="header-cta" href="#reserve">Reserve ↗</a></header>
   <main>
     <section class="hero-scroll" id="hero"><div class="hero-sticky"><canvas class="hero-canvas" id="sequence"></canvas><div class="hero-copy"><p class="eyebrow">Ceremonial matcha / Jumeirah 1</p><h1>Authentic Zen<br><em>in Jumeirah.</em></h1><p>Slow matcha. Clear mind.<br>Scroll to explore.</p></div><div class="scroll-cue"><i></i>Explore the pour</div><div class="hero-meta"><span>Matcha Vibes Cafe</span><span>4.9 / 575+ reviews</span><span>Dubai, UAE</span></div></div></section>
+    <section class="posthero-wave" aria-label="Animated matcha wave transition"><canvas id="gradientWaves" aria-hidden="true"></canvas><span class="posthero-wave-label">AFTER THE POUR / 02</span></section>
     <div class="orbit-nav"><span class="orbit-nav__brand">M / V</span><div class="orbit-nav__links"><a href="#menu">Menu</a><a href="#workshop">Workshop</a><a href="#visit">Visit</a></div><span class="orbit-nav__status">Jumeirah 1 / Dubai</span></div>
     <section class="depth-stage depth-stage--intro" id="story"><div class="orb orb--one"></div><div class="orb orb--two"></div><div class="depth-copy reveal-3d"><p class="kicker">01 / The pause</p><h2 class="depth-title">A little<br><em>green room.</em></h2><p>Matcha, sweets, and a slower rhythm.</p><a class="depth-link" href="#menu">Enter the menu <span>↗</span></a></div><div class="depth-image depth-image--intro parallax-card" data-depth="18"><div class="image-label">01 / AFTER THE POUR</div></div><div class="vertical-note">CEREMONIAL GRADE / 01</div></section>
     <section class="depth-stage depth-stage--menu" id="menu"><div class="menu-orbit-bg"></div><div class="depth-copy reveal-3d"><p class="kicker">02 / Signature tastings</p><h2 class="depth-title">Pick your<br><em>pause.</em></h2><p>Six reasons to stay for one more sip.</p></div><div class="floating-menu-grid"><article class="float-card parallax-card" data-depth="12"><img src="/assets/matcha-eclair.jpg" alt="Glossy matcha eclair" loading="lazy"><div><small>SWEET</small><h3>Matcha Eclair</h3><span>Delicate pastry</span></div></article><article class="float-card float-card--offset parallax-card" data-depth="20"><img src="/assets/matcha-shake.jpg" alt="Matcha shake" loading="lazy"><div><small>SIGNATURE</small><h3>Matcha Shake</h3><span>Cold. Creamy. Dramatic.</span></div></article><article class="float-card parallax-card" data-depth="15"><img src="/assets/matcha-soup-toast.jpg" alt="Chicken soup and pesto toast" loading="lazy"><div><small>COMFORT</small><h3>Soup + Toast</h3><span>Warm, bright finish</span></div></article></div><a class="depth-link menu-link" href="mailto:hello@matchavibes.ae?subject=Matcha%20Vibes%20Menu%20Enquiry">Ask about today <span>↗</span></a></section>
@@ -109,6 +112,18 @@
       interactive.forEach(el=>{el.addEventListener('pointerenter',()=>cursor.classList.add('is-hover'));el.addEventListener('pointerleave',()=>cursor.classList.remove('is-hover'));el.addEventListener('pointerdown',()=>cursor.classList.add('is-click'));el.addEventListener('pointerup',()=>cursor.classList.remove('is-click'));});
     }
     document.querySelectorAll('.magnetic-steps span').forEach(el=>{el.addEventListener('pointermove',event=>{if(matchMedia('(pointer:coarse)').matches)return;const r=el.getBoundingClientRect();el.style.transform=`translate(${(event.clientX-r.left-r.width/2)*.12}px,${(event.clientY-r.top-r.height/2)*.12-7}px)`});el.addEventListener('pointerleave',()=>el.style.transform='')});
+  </script>
+  <script>
+    (()=>{
+      const canvas=document.getElementById('gradientWaves');
+      const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(!canvas)return;
+      const ctx=canvas.getContext('2d',{alpha:true}); let raf=0,w=0,h=0,t=0,mx=.5;
+      const resize=()=>{const r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);w=r.width;h=r.height;canvas.width=w*d;canvas.height=h*d;ctx.setTransform(d,0,0,d,0,0)};
+      const draw=()=>{ctx.clearRect(0,0,w,h);const rows=7;for(let row=0;row<rows;row++){const y0=h*.25+row*h*.12;ctx.beginPath();for(let x=0;x<=w+18;x+=18){const n=x/w;const y=y0+Math.sin(n*9+t*(.7+row*.06)+mx*2.4)*12+Math.sin(n*19-t*.32)*4; x===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();const g=ctx.createLinearGradient(0,y0,0,h);g.addColorStop(0,`rgba(${row%2?157:78},${row%2?203:140},${row%2?120:85},${.12+row*.025})`);g.addColorStop(1,'rgba(7,17,14,0)');ctx.fillStyle=g;ctx.fill()}if(!reduced){t+=.008;raf=requestAnimationFrame(draw)}};
+      addEventListener('resize',resize,{passive:true});canvas.closest('.posthero-wave')?.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();mx=(e.clientX-r.left)/r.width},{passive:true});resize();draw();
+      addEventListener('pagehide',()=>cancelAnimationFrame(raf),{once:true});
+    })();
   </script>
 </body>
 </html>
