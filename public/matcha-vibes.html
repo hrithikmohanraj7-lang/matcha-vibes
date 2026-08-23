@@ -66,5 +66,31 @@
     if(!reduced){animate('.depth-title',{opacity:[0,1],translateY:[18,0],duration:850,ease:'out(4)',delay:stagger(70)});animate('.float-card',{opacity:[0,1],translateY:[26,0],duration:700,ease:'out(4)',delay:stagger(90)});animate('.orbit-nav',{opacity:[0,1],translateY:[-10,0],duration:600,ease:'out(4)'});}
     document.querySelectorAll('.parallax-card').forEach(card=>{let raf=0;card.addEventListener('pointermove',event=>{const r=card.getBoundingClientRect(),x=(event.clientX-r.left)/r.width-.5,y=(event.clientY-r.top)/r.height-.5;cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{card.style.setProperty('--rx',`${y*-5}deg`);card.style.setProperty('--ry',`${x*7}deg`);card.style.setProperty('--parallax',`${y*-Number(card.dataset.depth||12)}px`);});});card.addEventListener('pointerleave',()=>{card.style.setProperty('--rx','0deg');card.style.setProperty('--ry','0deg');});});
   </script>
+
+  <script type="module">
+    import { animate, stagger } from "https://cdn.jsdelivr.net/npm/animejs@4.5.0/+esm";
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const nav = document.querySelector('.orbit-nav');
+    const stages = [...document.querySelectorAll('.depth-stage')];
+    const seen = new WeakSet();
+    function enter(stage){
+      if(reduce || seen.has(stage)) return;
+      seen.add(stage);
+      const copy = stage.querySelector('.depth-copy');
+      const visual = stage.querySelector('.depth-image,.map-depth');
+      const cards = stage.querySelectorAll('.float-card');
+      if(copy) animate(copy,{opacity:[0,1],translateY:[28,0],rotateX:[6,0],duration:780,ease:'out(4)'});
+      if(visual) animate(visual,{opacity:[0,1],translateY:[34,0],rotateZ:[-2,0],duration:900,ease:'out(4)',delay:100});
+      if(cards.length) animate(cards,{opacity:[0,1],translateY:[30,0],rotateX:[8,0],duration:720,ease:'out(4)',delay:stagger(100)});
+      const steps=stage.querySelectorAll('.magnetic-steps span');
+      if(steps.length) animate(steps,{opacity:[0,1],translateX:[-12,0],duration:420,ease:'out(3)',delay:stagger(90)});
+      const actions=stage.querySelectorAll('.depth-link,.depth-cta');
+      if(actions.length) animate(actions,{opacity:[0,1],translateY:[10,0],duration:420,ease:'out(3)',delay:380});
+    }
+    const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting)enter(entry.target)}),{threshold:.22,rootMargin:'0px 0px -8%'});
+    stages.forEach(stage=>observer.observe(stage));
+    addEventListener('scroll',()=>{const y=scrollY;nav?.classList.toggle('is-deep',y>innerHeight*.72);stages.forEach(stage=>{const r=stage.getBoundingClientRect(),x=((innerWidth/2-(r.left+r.width/2))/innerWidth)*100+50,y=((innerHeight/2-(r.top+r.height/2))/innerHeight)*100+50;stage.style.setProperty('--glow-x',`${Math.max(20,Math.min(80,x))}%`);stage.style.setProperty('--glow-y',`${Math.max(18,Math.min(82,y))}%`)});},{passive:true});
+    document.querySelectorAll('.parallax-card').forEach(card=>{card.addEventListener('pointermove',event=>{if(reduce)return;const r=card.getBoundingClientRect(),x=(event.clientX-r.left)/r.width-.5,y=(event.clientY-r.top)/r.height-.5;card.style.setProperty('--rx',`${y*-6}deg`);card.style.setProperty('--ry',`${x*9}deg`);card.style.setProperty('--parallax',`${y*-Number(card.dataset.depth||12)}px`)});card.addEventListener('pointerleave',()=>{card.style.setProperty('--rx','0deg');card.style.setProperty('--ry','0deg')})});
+  </script>
 </body>
 </html>
