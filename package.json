@@ -12,6 +12,7 @@
     "@react-three/drei": "^10.7.8",
     "@react-three/fiber": "^9.7.0",
     "@react-three/postprocessing": "^3.0.5",
+    "animejs": "^4.5.0",
     "framer-motion": "^11.0.0",
     "gsap": "^3.12.5",
     "lenis": "^1.1.16",
